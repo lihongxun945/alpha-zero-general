@@ -3,9 +3,12 @@ sys.path.append('..')
 from utils import *
 
 import argparse
+import tensorflow as tf
 from tensorflow.keras.models import *
 from tensorflow.keras.layers import *
 from tensorflow.keras.optimizers import *
+
+# tf.config.experimental.set_visible_devices([], 'GPU') ## 解决DNN library is not found. 暂时禁用GPU
 
 class GobangNNet():
     def __init__(self, game, args):
@@ -29,4 +32,5 @@ class GobangNNet():
         self.v = Dense(1, activation='tanh', name='v')(s_fc2)                    # batch_size x 1
 
         self.model = Model(inputs=self.input_boards, outputs=[self.pi, self.v])
+        self.model.summary()
         self.model.compile(loss=['categorical_crossentropy','mean_squared_error'], optimizer=Adam(args.lr))

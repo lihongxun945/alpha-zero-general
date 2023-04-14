@@ -6,8 +6,10 @@
 /.pydevproject
 
 # checkpoint
-checkpoints/
+/checkpoint
 
 # For PyCharm users
 .idea/
+
+nohup.out
 

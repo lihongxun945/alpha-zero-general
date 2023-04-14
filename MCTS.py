@@ -17,16 +17,23 @@ class MCTS():
         self.game = game
         self.nnet = nnet
         self.args = args
+        # Nsa 是一个对象，其key 为元组 (boardString, action), 值为这个情况下模拟得分 v
         self.Qsa = {}  # stores Q values for s,a (as defined in the paper)
+        # Nsa 是一个对象，其key 为元组 (boardString, action), 值为这个情况下模拟胜利的次数
         self.Nsa = {}  # stores #times edge s,a was visited
+        # Nsa 是一个对象，其key 为boardString, 值为这个情况的棋盘被访问的次数
         self.Ns = {}  # stores #times board s was visited
+        # Nsa 是一个对象，其key 为boardString, 值为这个情况下的预测值，是一个数组，每一项表示当前位置的可能性
         self.Ps = {}  # stores initial policy (returned by neural net)
 
+        # Nsa 是一个对象，其key 为 boardString, 值为这个情况下胜利的角色，如果没有游戏结束，则为0
         self.Es = {}  # stores game.getGameEnded ended for board s
+        # Vs 是一个对象，其key 为 boardString, 值为一个数组，表示当前情况下合法的移动
         self.Vs = {}  # stores game.getValidMoves for board s
 
     def getActionProb(self, canonicalBoard, temp=1):
         """
+        返回一个数组，长度是棋盘中所有位置之和，每一个数字表示下在此位置的可能性 0~1
         This function performs numMCTSSims simulations of MCTS starting from
         canonicalBoard.
 
@@ -39,6 +46,12 @@ class MCTS():
 
         s = self.game.stringRepresentation(canonicalBoard)
         counts = [self.Nsa[(s, a)] if (s, a) in self.Nsa else 0 for a in range(self.game.getActionSize())]
+        if (self.args.showMCTSInfo):
+            print('counts:', np.array(counts).reshape(self.args.board_size, self.args.board_size))
+            qs = [int(self.Qsa[(s, a)]*10000) if (s, a) in self.Qsa else 0 for a in range(self.game.getActionSize())]
+            print('qs:', np.array(qs).reshape(self.args.board_size, self.args.board_size))
+            actions, v = self.nnet.predict(canonicalBoard)
+            print('pure predict: ', np.array([int(a * 10000) for a in actions]).reshape(self.args.board_size, self.args.board_size))
 
         if temp == 0:
             bestAs = np.array(np.argwhere(counts == np.max(counts))).flatten()

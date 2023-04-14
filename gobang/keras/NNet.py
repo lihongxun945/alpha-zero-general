@@ -17,7 +17,7 @@ from .GobangNNet import GobangNNet as onnet
 args = dotdict({
     'lr': 0.001,
     'dropout': 0.3,
-    'epochs': 10,
+    'epochs': 20,
     'batch_size': 64,
     'cuda': True,
     'num_channels': 512,
@@ -43,6 +43,7 @@ class NNetWrapper(NeuralNet):
 
     def predict(self, board):
         """
+        返回值是两个，第一个是一个数组，其中是每一个位置的可能性0~1，第二个是一个值 -1~1 表示当前局势的评分
         board: np array with board
         """
         # timing

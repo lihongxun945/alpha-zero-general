@@ -22,13 +22,14 @@ class GobangGame(Game):
 
     def getActionSize(self):
         # return number of actions
-        return self.n * self.n + 1
+        # return self.n * self.n + 1 # 这里也有问题，+1 是黑白棋无子可走需要调过，五子棋不存在，无子可走就平局了
+        return self.n * self.n
 
     def getNextState(self, board, player, action):
         # if player takes action on board, return next (board,player)
         # action must be a valid move
-        if action == self.n * self.n:
-            return (board, -player)
+        # if action == self.n * self.n: # 这里也不需要，五子棋不存在无子可走的状态
+        #     return (board, -player)
         b = Board(self.n)
         b.pieces = np.copy(board)
         move = (int(action / self.n), action % self.n)
@@ -36,6 +37,7 @@ class GobangGame(Game):
         return (b.pieces, -player)
 
     # modified
+    # 返回一个 n*n 长度的一位数组，其中每一位是0或1，0表示合法，1表示不合法
     def getValidMoves(self, board, player):
         # return a fixed size binary vector
         valids = [0] * self.getActionSize()
@@ -61,16 +63,16 @@ class GobangGame(Game):
             for h in range(self.n):
                 if (w in range(self.n - n + 1) and board[w][h] != 0 and
                         len(set(board[i][h] for i in range(w, w + n))) == 1):
-                    return board[w][h]
+                    return board[w][h] * player
                 if (h in range(self.n - n + 1) and board[w][h] != 0 and
                         len(set(board[w][j] for j in range(h, h + n))) == 1):
-                    return board[w][h]
+                    return board[w][h] * player
                 if (w in range(self.n - n + 1) and h in range(self.n - n + 1) and board[w][h] != 0 and
                         len(set(board[w + k][h + k] for k in range(n))) == 1):
-                    return board[w][h]
+                    return board[w][h] * player
                 if (w in range(self.n - n + 1) and h in range(n - 1, self.n) and board[w][h] != 0 and
                         len(set(board[w + l][h - l] for l in range(n))) == 1):
-                    return board[w][h]
+                    return board[w][h] * player
         if b.has_legal_moves():
             return 0
         return 1e-4
@@ -82,8 +84,9 @@ class GobangGame(Game):
     # modified
     def getSymmetries(self, board, pi):
         # mirror, rotational
-        assert(len(pi) == self.n**2 + 1)  # 1 for pass
-        pi_board = np.reshape(pi[:-1], (self.n, self.n))
+        # 改了一下
+        # pi_board = np.reshape(pi[:-1], (self.n, self.n))
+        pi_board = np.reshape(pi, (self.n, self.n))
         l = []
 
         for i in range(1, 5):
@@ -93,7 +96,8 @@ class GobangGame(Game):
                 if j:
                     newB = np.fliplr(newB)
                     newPi = np.fliplr(newPi)
-                l += [(newB, list(newPi.ravel()) + [pi[-1]])]
+                # l += [(newB, list(newPi.ravel()) + [pi[-1]])] # 长度变了改一下
+                l += [(newB, list(newPi.ravel()))]
         return l
 
     def stringRepresentation(self, board):
