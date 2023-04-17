@@ -23,6 +23,20 @@ class Board():
     def __getitem__(self, index): 
         return self.pieces[index]
 
+   #def get_legal_moves(self, color):
+   #    """Returns all the legal moves for the given color.
+   #    (1 for white, -1 for black
+   #    """
+   #    moves = set()  # stores the legal moves.
+
+   #    # Get all empty locations.
+   #    for y in range(self.n):
+   #        for x in range(self.n):
+   #            if self[x][y] == 0:
+   #                moves.add((x, y))
+   #    return list(moves)
+
+    #新方法，只返回2步以内有棋子的位置，这样能大幅减少搜索量"
     def get_legal_moves(self, color):
         """Returns all the legal moves for the given color.
         (1 for white, -1 for black
@@ -33,7 +47,20 @@ class Board():
         for y in range(self.n):
             for x in range(self.n):
                 if self[x][y] == 0:
-                    moves.add((x, y))
+                    find = False
+                    for i in [-2, -1, 0, 1, 2]:
+                        if find:
+                            break
+                        for j in [-2, -1, 0, 1, 2]:
+                            if (x+i>=0) & (x+i<self.n) & (y+j>=0) & (y+j<self.n):
+                                if self[x+i][y+j] != 0:
+                                    find = True
+                                    break
+                    if find:
+                        moves.add((x, y))
+        # 如果中间没人走，也要包括中间
+        if self[int(self.n/2)][int(self.n/2)] == 0:
+            moves.add((int(self.n/2), int(self.n/2)))
         return list(moves)
 
     def has_legal_moves(self):
