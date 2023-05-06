@@ -10,6 +10,8 @@ from tensorflow.keras.optimizers import *
 
 # tf.config.experimental.set_visible_devices([], 'GPU') ## 解决DNN library is not found. 暂时禁用GPU
 
+print('GPUS: ', tf.config.list_physical_devices('GPU'))
+
 class GobangNNet():
     def __init__(self, game, args):
         # game params
