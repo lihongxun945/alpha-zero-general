@@ -26,10 +26,10 @@ args = dotdict({
     'cpuct': 1,
 
     'checkpoint': './checkpoint/gobang{}_{}'.format(board_size, row_count),
-    'load_model': True, # 是否加载之前训练的模型
+    'load_model': False, # 是否加载之前训练的模型
     'load_folder_file': ('./checkpoint/gobang{}_{}'.format(board_size, row_count), 'best.pth.tar'),
     'numItersForTrainExamplesHistory': 20, # 神经网络要拟合的训练集
-    'load_examples': True, # 是否加载之前的数据集
+    'load_examples': False, # 是否加载之前的数据集
 
     'reduce': 0.9, # 衰减因子
     'board_size': board_size,
