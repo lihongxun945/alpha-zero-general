@@ -17,7 +17,7 @@ from .GobangNNet import GobangNNet as onnet
 args = dotdict({
     'lr': 0.001,
     'dropout': 0.3,
-    'epochs': 20,
+    'epochs': 10,
     'batch_size': 64,
     'cuda': True,
     'num_channels': 512,
