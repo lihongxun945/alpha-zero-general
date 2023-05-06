@@ -1,11 +1,15 @@
 import logging
 import math
+import time
 
 import numpy as np
 
 EPS = 1e-8
 
 log = logging.getLogger(__name__)
+
+total_predict_time = 0
+total_predict_count = 0
 
 
 class MCTS():
@@ -41,8 +45,18 @@ class MCTS():
             probs: a policy vector where the probability of the ith action is
                    proportional to Nsa[(s,a)]**(1./temp)
         """
+        global total_predict_time
+        global total_predict_count
+
+        total_predict_time = 0
+        total_predict_count = 0
+
+        start_time = time.time()
+
         for i in range(self.args.numMCTSSims):
             self.search(canonicalBoard)
+
+        print('total time:', time.time() - start_time, ', predict_time:', total_predict_time, ', average predict time:', 0 if total_predict_count == 0 else total_predict_time/total_predict_count)
 
         s = self.game.stringRepresentation(canonicalBoard)
         counts = [self.Nsa[(s, a)] if (s, a) in self.Nsa else 0 for a in range(self.game.getActionSize())]
@@ -85,6 +99,9 @@ class MCTS():
             v: the negative of the value of the current canonicalBoard
         """
 
+        global total_predict_time
+        global total_predict_count
+
         s = self.game.stringRepresentation(canonicalBoard)
 
         if s not in self.Es:
@@ -95,7 +112,11 @@ class MCTS():
 
         if s not in self.Ps:
             # leaf node
+
+            start_time = time.time()
             self.Ps[s], v = self.nnet.predict(canonicalBoard)
+            total_predict_time += (time.time() - start_time)
+            total_predict_count += 1
             valids = self.game.getValidMoves(canonicalBoard, 1)
             self.Ps[s] = self.Ps[s] * valids  # masking invalid moves
             sum_Ps_s = np.sum(self.Ps[s])
