@@ -56,11 +56,11 @@ class MCTS():
         for i in range(self.args.numMCTSSims):
             self.search(canonicalBoard)
 
-        print('total time:', time.time() - start_time, ', predict_time:', total_predict_time, ', average predict time:', 0 if total_predict_count == 0 else total_predict_time/total_predict_count)
 
         s = self.game.stringRepresentation(canonicalBoard)
         counts = [self.Nsa[(s, a)] if (s, a) in self.Nsa else 0 for a in range(self.game.getActionSize())]
         if (self.args.showMCTSInfo):
+            print('total time:', time.time() - start_time, ', predict_time:', total_predict_time, ', average predict time:', 0 if total_predict_count == 0 else total_predict_time/total_predict_count)
             print('counts:', np.array(counts).reshape(self.args.board_size, self.args.board_size))
             qs = [int(self.Qsa[(s, a)]*10000) if (s, a) in self.Qsa else 0 for a in range(self.game.getActionSize())]
             print('qs:', np.array(qs).reshape(self.args.board_size, self.args.board_size))

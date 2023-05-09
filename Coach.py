@@ -33,7 +33,7 @@ class Coach():
         self.selfPlayWhiteWin = 0
         self.selfPlayDraws = 0
 
-    def executeEpisode(self):
+    def executeEpisode(self, itr):
         """
         This function executes one episode of self-play, starting with player 1.
         As the game is played, each turn is added as a training example to
@@ -74,7 +74,7 @@ class Coach():
             if r != 0:
                 self.game.display(board)
                 whiteWin = self.game.getGameEnded(board, 1)
-                print('total step {}, winner is {}'.format(episodeStep, whiteWin))
+                print('#', itr, ': total step {}, winner is {}'.format(episodeStep, whiteWin))
                 if whiteWin == -1:
                     self.selfPlayBlackWin += 1
                 elif whiteWin == 1:
@@ -107,7 +107,7 @@ class Coach():
 
                 for _ in tqdm(range(self.args.numEps), desc="Self Play"):
                     self.mcts = MCTS(self.game, self.nnet, self.args)  # reset search tree
-                    iterationTrainExamples += self.executeEpisode()
+                    iterationTrainExamples += self.executeEpisode(_)
 
                 # save the iteration examples to the history 
                 self.trainExamplesHistory.append(iterationTrainExamples)
@@ -161,7 +161,13 @@ class Coach():
         filename = modelFile + ".examples"
         with open(filename, "wb+") as f:
             Pickler(f).dump(self.trainExamplesHistory)
-        f.closed
+        f.close()
+
+        ## 保存备份，避免只有一个文件损坏了无法恢复
+        filename = modelFile + "." + str(iteration) + ".examples"
+        with open(filename, "wb+") as f:
+            Pickler(f).dump(self.trainExamplesHistory)
+        f.close()
 
     def loadTrainExamples(self):
         modelFile = os.path.join(self.args.load_folder_file[0], self.args.load_folder_file[1])

@@ -30,7 +30,7 @@ hp = HumanGobangPlayer(g).play
 n1 = NNet(g)
 n1.load_checkpoint('./checkpoint/gobang{}_{}'.format(board_size, row_count),'best.h5')
 args1 = dotdict({
-    'numMCTSSims': 300,
+    'numMCTSSims': 400,
     'cpuct':1.0,
     'showMCTSInfo': True,
     'board_size': board_size,
