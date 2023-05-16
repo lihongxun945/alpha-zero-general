@@ -28,7 +28,7 @@ args = dotdict({
     'checkpoint': './checkpoint/gobang{}_{}'.format(board_size, row_count),
     'load_model': True, # 是否加载之前训练的模型
     'load_folder_file': ('./checkpoint/gobang{}_{}'.format(board_size, row_count), 'best.pth.tar'),
-    'numItersForTrainExamplesHistory': 40, # 神经网络要拟合的训练集
+    'numItersForTrainExamplesHistory': 20, # 神经网络要拟合的训练集
     'load_examples': True, # 是否加载之前的数据集
 
     'reduce': 0.95, # 衰减因子

@@ -116,7 +116,7 @@ class Coach():
             if len(self.trainExamplesHistory) > self.args.numItersForTrainExamplesHistory:
                 log.warning(
                     f"Removing the oldest entry in trainExamples. len(trainExamplesHistory) = {len(self.trainExamplesHistory)}")
-                self.trainExamplesHistory.pop(0)
+                del self.trainExamplesHistory[-(len(self.trainExamplesHistory) - self.args.numItersForTrainExamplesHistory):]
             # backup history to a file
             # NB! the examples were collected using the model from the previous iteration, so (i-1)  
             # self.saveTrainExamples(i - 1)
@@ -134,21 +134,24 @@ class Coach():
             pmcts = MCTS(self.game, self.pnet, self.args)
 
             self.nnet.train(trainExamples)
-            nmcts = MCTS(self.game, self.nnet, self.args)
+           #nmcts = MCTS(self.game, self.nnet, self.args)
 
-            log.info('PITTING AGAINST PREVIOUS VERSION')
-            arena = Arena(lambda x: np.argmax(pmcts.getActionProb(x, temp=0)),
-                          lambda x: np.argmax(nmcts.getActionProb(x, temp=0)), self.game, self.game.display)
-            pwins, nwins, draws = arena.playGames(self.args.arenaCompare, verbose=True)
+           #log.info('PITTING AGAINST PREVIOUS VERSION')
+           #arena = Arena(lambda x: np.argmax(pmcts.getActionProb(x, temp=0)),
+           #              lambda x: np.argmax(nmcts.getActionProb(x, temp=0)), self.game, self.game.display)
+           #pwins, nwins, draws = arena.playGames(self.args.arenaCompare, verbose=True)
 
-            log.info('NEW/PREV WINS : %d / %d ; DRAWS : %d' % (nwins, pwins, draws))
-            if pwins + nwins == 0 or float(nwins) / (pwins + nwins) < self.args.updateThreshold:
-                log.info('REJECTING NEW MODEL')
-                self.nnet.load_checkpoint(folder=self.args.checkpoint, filename='temp.pth.tar')
-            else:
-                log.info('ACCEPTING NEW MODEL')
-                self.nnet.save_checkpoint(folder=self.args.checkpoint, filename=self.getCheckpointFile(i))
-                self.nnet.save_checkpoint(folder=self.args.checkpoint, filename='best.pth.tar')
+           #log.info('NEW/PREV WINS : %d / %d ; DRAWS : %d' % (nwins, pwins, draws))
+           #if pwins + nwins == 0 or float(nwins) / (pwins + nwins) < self.args.updateThreshold:
+           #    log.info('REJECTING NEW MODEL')
+           #    self.nnet.load_checkpoint(folder=self.args.checkpoint, filename='temp.pth.tar')
+           #else:
+           #    log.info('ACCEPTING NEW MODEL')
+           #    self.nnet.save_checkpoint(folder=self.args.checkpoint, filename=self.getCheckpointFile(i))
+           #    self.nnet.save_checkpoint(folder=self.args.checkpoint, filename='best.pth.tar')
+            log.info('SAVING CHECKPOINT')
+            self.nnet.save_checkpoint(folder=self.args.checkpoint, filename=self.getCheckpointFile(i))
+            self.nnet.save_checkpoint(folder=self.args.checkpoint, filename='best.pth.tar')
 
     def getCheckpointFile(self, iteration):
         return 'checkpoint_' + str(iteration) + '.pth.tar'
@@ -182,7 +185,7 @@ class Coach():
             log.info(examplesFile)
             with open(examplesFile, "rb") as f:
                 self.trainExamplesHistory = Unpickler(f).load()
-            log.info('Loading done!')
+            log.info('Loading done! total history ' + str(len(self.trainExamplesHistory)))
 
             # examples based on the model were already collected (loaded)
             self.skipFirstSelfPlay = True
