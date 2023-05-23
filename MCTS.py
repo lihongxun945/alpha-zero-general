@@ -54,7 +54,7 @@ class MCTS():
         start_time = time.time()
 
         for i in range(self.args.numMCTSSims):
-            self.search(canonicalBoard)
+            self.search(canonicalBoard, True)
 
 
         s = self.game.stringRepresentation(canonicalBoard)
@@ -79,7 +79,7 @@ class MCTS():
         probs = [x / counts_sum for x in counts]
         return probs
 
-    def search(self, canonicalBoard):
+    def search(self, canonicalBoard, top=False):
         """
         This function performs one iteration of MCTS. It is recursively called
         till a leaf node is found. The action chosen at each node is one that
@@ -114,7 +114,12 @@ class MCTS():
             # leaf node
 
             start_time = time.time()
-            self.Ps[s], v = self.nnet.predict(canonicalBoard)
+            p, v = self.nnet.predict(canonicalBoard)
+            # 每次搜索开始阶段加噪声，增加探索的可能性
+            if self.args.is_self_play and top:
+                self.Ps[s] = 0.75*p + 0.25 * np.random.dirichlet(0.03*np.ones(len(p)))
+            else:
+                self.Ps[s] = p
             total_predict_time += (time.time() - start_time)
             total_predict_count += 1
             valids = self.game.getValidMoves(canonicalBoard, 1)
