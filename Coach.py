@@ -150,7 +150,8 @@ class Coach():
            #    self.nnet.save_checkpoint(folder=self.args.checkpoint, filename=self.getCheckpointFile(i))
            #    self.nnet.save_checkpoint(folder=self.args.checkpoint, filename='best.pth.tar')
             log.info('SAVING CHECKPOINT')
-            self.nnet.save_checkpoint(folder=self.args.checkpoint, filename=self.getCheckpointFile(i))
+            if (i % self.args.save_checkpoint_count == 0):
+                self.nnet.save_checkpoint(folder=self.args.checkpoint, filename=self.getCheckpointFile(i))
             self.nnet.save_checkpoint(folder=self.args.checkpoint, filename='best.pth.tar')
 
     def getCheckpointFile(self, iteration):
@@ -167,10 +168,11 @@ class Coach():
         f.close()
 
         ## 保存备份，避免只有一个文件损坏了无法恢复
-        filename = modelFile + "." + str(iteration) + ".examples"
-        with open(filename, "wb+") as f:
-            Pickler(f).dump(self.trainExamplesHistory)
-        f.close()
+        if (iteration % self.args.save_examples_count == 0):
+            filename = modelFile + "." + iteration + ".examples"
+            with open(filename, "wb+") as f:
+                Pickler(f).dump(self.trainExamplesHistory)
+            f.close()
 
     def loadTrainExamples(self):
         modelFile = os.path.join(self.args.load_folder_file[0], self.args.load_folder_file[1])

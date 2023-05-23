@@ -11,27 +11,31 @@ log = logging.getLogger(__name__)
 
 coloredlogs.install(level='INFO')  # Change this to DEBUG to see more info.
 
-board_size = 11
+board_size = 15
 row_count = 5
 
 args = dotdict({
     'numIters': 100,
     'numEps': 100,              # Number of complete self-play games to simulate during a new iteration.
-    'tempThreshold': 10,        # 蒙特卡洛搜索温度阈值，每一次self play的前tempThreshold 步，会采用更随机的策略，否则采用更优策略
+    'tempThreshold': 30,        # 蒙特卡洛搜索温度阈值，每一次self play的前tempThreshold 步，会采用更随机的策略，否则采用更优策略
     'updateThreshold': 0.6,     # During arena playoff, new neural net will be accepted if threshold or more of games are won.
     'maxlenOfQueue': 200000,    # Number of game examples to train the neural networks.
     # 'numMCTSSims': 25,          # Number of games moves for MCTS to simulate.
-    'numMCTSSims': 400,          # Number of games moves for MCTS to simulate.
+    'numMCTSSims': 1000,          # Number of games moves for MCTS to simulate.
     'arenaCompare': 20,         # Number of games to play during arena play to determine if new net will be accepted.
     'cpuct': 1,
 
     'checkpoint': './checkpoint/gobang{}_{}'.format(board_size, row_count),
-    'load_model': True, # 是否加载之前训练的模型
+    'load_model': False, # 是否加载之前训练的模型
     'load_folder_file': ('./checkpoint/gobang{}_{}'.format(board_size, row_count), 'best.pth.tar'),
-    'numItersForTrainExamplesHistory': 20, # 神经网络要拟合的训练集
-    'load_examples': True, # 是否加载之前的数据集
+    'numItersForTrainExamplesHistory': 40, # 神经网络要拟合的训练集
+    'load_examples': False, # 是否加载之前的数据集
+    'save_checkpoint_count': 10, # 每训练多少次保存一次模型
+    'save_examples_count': 10, # 每训练多少次保存一次数据集
+    'is_self_play': True, # 是否自我对弈
 
-    'reduce': 0.95, # 衰减因子
+
+    'reduce': 1, # 衰减因子
     'board_size': board_size,
     'showMCTSInfo': False,
 

@@ -59,8 +59,12 @@ class Board():
                     if find:
                         moves.add((x, y))
         # 如果中间没人走，也要包括中间
-        if self[int(self.n/2)][int(self.n/2)] == 0:
-            moves.add((int(self.n/2), int(self.n/2)))
+        for x in [-2, -1, 0, 1, 2]:
+            for y in [-2, -1, 0, 1, 2]:
+                i = int(self.n/2) + x
+                j = int(self.n/2) + y
+                if self[i][j] == 0:
+                    moves.add((i, j))
         return list(moves)
 
     def has_legal_moves(self):

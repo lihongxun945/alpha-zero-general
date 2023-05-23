@@ -34,6 +34,7 @@ args1 = dotdict({
     'cpuct':1.0,
     'showMCTSInfo': True,
     'board_size': board_size,
+    'is_self_play': False, # 是否自我对弈
 })
 mcts1 = MCTS(g, n1, args1)
 def n1p(x):
