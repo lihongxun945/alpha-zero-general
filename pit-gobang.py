@@ -13,7 +13,7 @@ use this script to play any two agents against each other, or play manually with
 any agent.
 """
 
-board_size = 11 # Play in 6x6 instead of the normal 8x8.
+board_size = 15 # Play in 6x6 instead of the normal 8x8.
 row_count = 5
 human_vs_cpu = True
 

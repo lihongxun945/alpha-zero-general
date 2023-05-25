@@ -113,7 +113,7 @@ class GobangGame(Game):
         print("")
         print(" -----------------------")
         for y in range(n):
-            print(y, "|", end="")    # print the row #
+            print(' ' if y < 10 else '', y, "|", end="")    # print the row #
             for x in range(n):
                 piece = board[y][x]    # get the piece to print
                 if piece == -1:
