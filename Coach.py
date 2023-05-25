@@ -169,7 +169,7 @@ class Coach():
 
         ## 保存备份，避免只有一个文件损坏了无法恢复
         if (iteration % self.args.save_examples_count == 0):
-            filename = modelFile + "." + iteration + ".examples"
+            filename = modelFile + "." + str(iteration) + ".examples"
             with open(filename, "wb+") as f:
                 Pickler(f).dump(self.trainExamplesHistory)
             f.close()
