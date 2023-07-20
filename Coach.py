@@ -32,6 +32,7 @@ class Coach():
         self.selfPlayBlackWin = 0
         self.selfPlayWhiteWin = 0
         self.selfPlayDraws = 0
+        self.pitHistory = []
 
     def executeEpisode(self, itr):
         """
@@ -64,6 +65,11 @@ class Coach():
             for b, p in sym:
                 trainExamples.append([b, self.curPlayer, p, episodeStep])
 
+            if temp == 1:
+                valid_moves_mask = self.game.getValidMoves(canonicalBoard, self.curPlayer)
+                dirichlet_noise_mask = np.where(valid_moves_mask > 0, 1, 1e-8)
+                dirichlet_noise = np.random.dirichlet(0.03 * dirichlet_noise_mask)
+                pi = 0.75*np.array(pi)+ 0.25 * dirichlet_noise
             action = np.random.choice(len(pi), p=pi)
             board, self.curPlayer = self.game.getNextState(board, self.curPlayer, action)
 
@@ -134,25 +140,27 @@ class Coach():
             pmcts = MCTS(self.game, self.pnet, self.args)
 
             self.nnet.train(trainExamples)
-           #nmcts = MCTS(self.game, self.nnet, self.args)
+            nmcts = MCTS(self.game, self.nnet, self.args)
 
-           #log.info('PITTING AGAINST PREVIOUS VERSION')
-           #arena = Arena(lambda x: np.argmax(pmcts.getActionProb(x, temp=0)),
-           #              lambda x: np.argmax(nmcts.getActionProb(x, temp=0)), self.game, self.game.display)
-           #pwins, nwins, draws = arena.playGames(self.args.arenaCompare, verbose=True)
+            log.info('PITTING AGAINST PREVIOUS VERSION')
+            arena = Arena(lambda x: np.argmax(pmcts.getActionProb(x, temp=0)),
+                            lambda x: np.argmax(nmcts.getActionProb(x, temp=0)), self.game, self.game.display)
+            pwins, nwins, draws = arena.playGames(self.args.arenaCompare, verbose=False)
 
-           #log.info('NEW/PREV WINS : %d / %d ; DRAWS : %d' % (nwins, pwins, draws))
-           #if pwins + nwins == 0 or float(nwins) / (pwins + nwins) < self.args.updateThreshold:
-           #    log.info('REJECTING NEW MODEL')
-           #    self.nnet.load_checkpoint(folder=self.args.checkpoint, filename='temp.pth.tar')
-           #else:
-           #    log.info('ACCEPTING NEW MODEL')
-           #    self.nnet.save_checkpoint(folder=self.args.checkpoint, filename=self.getCheckpointFile(i))
-           #    self.nnet.save_checkpoint(folder=self.args.checkpoint, filename='best.pth.tar')
-            log.info('SAVING CHECKPOINT')
-            if (i % self.args.save_checkpoint_count == 0):
+            log.info('NEW/PREV WINS : %d / %d ; DRAWS : %d' % (nwins, pwins, draws))
+            if pwins + nwins == 0 or float(nwins) / (pwins + nwins) < self.args.updateThreshold:
+                log.info('REJECTING NEW MODEL')
+                self.nnet.load_checkpoint(folder=self.args.checkpoint, filename='temp.pth.tar')
+            else:
+                log.info('ACCEPTING NEW MODEL')
                 self.nnet.save_checkpoint(folder=self.args.checkpoint, filename=self.getCheckpointFile(i))
-            self.nnet.save_checkpoint(folder=self.args.checkpoint, filename='best.pth.tar')
+                self.nnet.save_checkpoint(folder=self.args.checkpoint, filename='best.pth.tar')
+            self.pitHistory.append(nwins/(pwins+nwins))
+            print('pitting history: ', self.pitHistory)
+            # log.info('SAVING CHECKPOINT')
+            # if (i % self.args.save_checkpoint_count == 0):
+            #     self.nnet.save_checkpoint(folder=self.args.checkpoint, filename=self.getCheckpointFile(i))
+            # self.nnet.save_checkpoint(folder=self.args.checkpoint, filename='best.pth.tar')
 
     def getCheckpointFile(self, iteration):
         return 'checkpoint_' + str(iteration) + '.pth.tar'

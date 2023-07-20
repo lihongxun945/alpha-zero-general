@@ -13,7 +13,7 @@ use this script to play any two agents against each other, or play manually with
 any agent.
 """
 
-board_size = 15 # Play in 6x6 instead of the normal 8x8.
+board_size = 9 # Play in 6x6 instead of the normal 8x8.
 row_count = 5
 human_vs_cpu = True
 
@@ -30,7 +30,7 @@ hp = HumanGobangPlayer(g).play
 n1 = NNet(g)
 n1.load_checkpoint('./checkpoint/gobang{}_{}'.format(board_size, row_count),'best.h5')
 args1 = dotdict({
-    'numMCTSSims': 400,
+    'numMCTSSims': 500,
     'cpuct':1.0,
     'showMCTSInfo': True,
     'board_size': board_size,
@@ -39,7 +39,6 @@ args1 = dotdict({
 mcts1 = MCTS(g, n1, args1)
 def n1p(x):
   actions = mcts1.getActionProb(x, temp=0)
-  print('actions', actions)
   return np.argmax(actions)
 
 def purePredict(x):

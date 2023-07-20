@@ -115,11 +115,7 @@ class MCTS():
 
             start_time = time.time()
             p, v = self.nnet.predict(canonicalBoard)
-            # 每次搜索开始阶段加噪声，增加探索的可能性
-            if self.args.is_self_play and top:
-                self.Ps[s] = 0.75*p + 0.25 * np.random.dirichlet(0.03*np.ones(len(p)))
-            else:
-                self.Ps[s] = p
+            self.Ps[s] = p
             total_predict_time += (time.time() - start_time)
             total_predict_count += 1
             valids = self.game.getValidMoves(canonicalBoard, 1)
